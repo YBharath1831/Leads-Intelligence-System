@@ -1,0 +1,70 @@
+# =============================================================================
+# Lead Qualifier Configuration
+# Company profile assumed for this demo: a mid-market B2B SaaS company selling
+# a workflow/analytics platform to other companies, deal sizes $5k-$60k/yr.
+# Edit this file to re-target the rubric to a different ICP without touching code.
+# =============================================================================
+
+api:
+  # provider: "anthropic" | "mock"
+  # "mock" runs a deterministic local stand-in for the LLM (no network / no key
+  # required) so the whole pipeline can be demoed and graded offline. Flip to
+  # "anthropic" and set ANTHROPIC_API_KEY to hit the real API.
+  provider: "mock"
+  model: "claude-3-5-haiku-20241022"
+  max_tokens: 4096
+  batch_size: 10          # leads sent to the LLM per API call
+  max_retries: 4
+  base_backoff_seconds: 1.5
+  request_timeout_seconds: 30
+
+# -----------------------------------------------------------------------------
+# Rubric: five factors, each 0-10, combined with the weights below into a
+# 0-10 rule_score. The rule_score is a fast, deterministic, auditable first
+# pass. The LLM then reviews it against the free-text lead notes and can
+# adjust the final score, but must justify any adjustment >1.5 points.
+# -----------------------------------------------------------------------------
+rubric:
+  weights:
+    company_size_fit: 0.25
+    industry_fit: 0.25
+    engagement_recency: 0.20
+    source_quality: 0.15
+    budget_timeline_signal: 0.15
+
+  # Sweet spot company size for this ICP. Sizes outside the range still score
+  # partial credit based on distance from the nearest edge.
+  target_company_size_band: ["51-200", "201-500"]
+  acceptable_company_size_bands: ["11-50", "501-1000"]
+  poor_fit_company_size_bands: ["1-10", "1000+"]
+
+  target_industries: ["SaaS/Software", "Technology", "E-commerce/Retail", "Financial Services"]
+  acceptable_industries: ["Healthcare Tech", "Manufacturing", "Logistics"]
+  poor_fit_industries: ["Nonprofit", "Legal", "Real Estate", "Education"]
+
+  source_quality_scores:
+    Referral: 10
+    Demo Request: 9
+    Webinar: 7
+    Trade Show: 6
+    Content Download: 5
+    Organic Search: 5
+    Paid Ad: 3
+    Cold Outreach List: 2
+
+  # Engagement recency thresholds, in days since last interaction.
+  recency_bands:
+    - {max_days: 7,  score: 10}
+    - {max_days: 14, score: 8}
+    - {max_days: 30, score: 6}
+    - {max_days: 60, score: 3}
+    - {max_days: 999999, score: 1}
+
+  # Decision thresholds on the final 0-10 score.
+  qualify_threshold: 7.0
+  reject_threshold: 4.0
+  # Anything strictly between reject_threshold and qualify_threshold -> "review"
+
+  # Notes are also flagged for forced human review regardless of score if they
+  # contain strong negative signals (e.g. explicit "no budget", "not now").
+  force_review_keywords: ["no budget", "not interested", "just researching", "no timeline", "student"]

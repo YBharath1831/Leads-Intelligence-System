@@ -1,0 +1,50 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Local secrets and environment variables
+.env
+.env.*
+!.env.example
+
+# Streamlit local configuration and secrets
+.streamlit/secrets.toml
+
+# Generated lead reports
+output_report.csv
+output_report.json
+*_report.csv
+*_report.json
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+~$*
+
+# Build and packaging artifacts
+build/
+dist/
+*.egg-info/
+
+# Editor settings
+.vscode/
+.idea/
+*.code-workspace
+
+# Operating-system artifacts
+.DS_Store
+Thumbs.db
+Desktop.ini
