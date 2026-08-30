@@ -96,3 +96,18 @@ The optional `notes` field improves budget/timeline scoring and outreach persona
 - `anthropic` uses the configured Claude model and requires `ANTHROPIC_API_KEY`.
 
 Both interfaces default to their own `config.yaml` file.
+
+## Qualification rubric
+
+Each lead receives a deterministic score from 0 to 10 using five weighted factors: company-size fit, industry fit, engagement recency, source quality, and budget/timeline signals found in the notes. The LLM then reviews the lead context and may adjust that score within the configured limits while providing a reason; scores of 7 or higher are qualified, scores of 4 or lower are rejected, and scores between those thresholds require human review. Leads with missing required data or configured negative signals are routed to review instead of being automatically qualified.
+
+## Known limitations and edge cases
+
+- Mock mode uses keyword heuristics rather than real language understanding, so it may miss nuance, implied intent, sarcasm, or conflicting signals.
+- Scoring depends on the exact company-size bands, industry names, and source labels configured in each interface. Unknown values receive conservative fallback scores rather than being inferred automatically.
+- Budget and timeline scoring depends on the optional `notes` column. Missing or sparse notes reduce personalization quality and may leave otherwise promising leads ambiguous.
+- Invalid or missing required fields are handled conservatively and routed to human review, but the system does not attempt to repair or enrich the data.
+- Duplicate contacts are processed as separate leads because the pipeline does not currently perform deduplication or identity matching.
+- If an LLM batch fails after all retries, every lead in that batch falls back to its rule score and is marked for human review.
+- Outreach messages are generated from supplied lead data and should be reviewed before sending, particularly when notes contain sensitive, unclear, or outdated information.
+- Priority ranking is primarily based on score and recency; it does not account for sales territory, representative capacity, expected contract value, or existing account ownership.
